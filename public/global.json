@@ -1,5 +1,20 @@
 {
   "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v3.0.0/src/parser/GlobalConfigSchema.json",
-  "configsList": [],
-  "configs": {}
+  "configsList": [
+    "example-study",
+    "tutorial"
+  ],
+  "configs": {
+    "example-study": {
+      "path": "example-study/config.json",
+      "tab": "Tutorials"
+    },
+    "tutorial": {
+      "path": "tutorial/config.json",
+      "tab": "Tutorials"
+    }
+  },
+  "tabs": [
+    { "label": "Tutorials" }
+  ]
 }
