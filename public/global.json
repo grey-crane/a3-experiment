@@ -1,20 +1,25 @@
 {
   "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v3.0.0/src/parser/GlobalConfigSchema.json",
   "configsList": [
-    "example-study",
+    "a3-study",
     "tutorial"
   ],
   "configs": {
+    "tutorial": {
+      "path": "tutorial/config.json",
+      "tab": "Tutorials"
+    },
     "example-study": {
       "path": "example-study/config.json",
       "tab": "Tutorials"
     },
-    "tutorial": {
-      "path": "tutorial/config.json",
-      "tab": "Tutorials"
+    "a3-study": {
+      "path": "a3-study/config.json",
+      "tab": "A3"
     }
   },
   "tabs": [
+    { "label": "A3" },
     { "label": "Tutorials" }
   ]
 }
