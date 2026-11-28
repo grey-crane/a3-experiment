@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"mime"
 	"net/http"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 
 	"github.com/fastly/compute-sdk-go/fsthttp"
@@ -23,7 +21,7 @@ func main() {
 	// Log service version.
 	fmt.Println("FASTLY_SERVICE_VERSION:", os.Getenv("FASTLY_SERVICE_VERSION"))
 
-	// Re-root the embedded FS so "site/" is not part of request paths.
+	// Re-root the embedded filesystem so "site/" is not part of request paths.
 	site, err := fs.Sub(embedded, "site")
 	if err != nil {
 		panic(err)
@@ -32,7 +30,6 @@ func main() {
 	router := httprouter.New()
 	handler := staticHandler(site)
 	router.GET("/*filepath", handler)
-	router.HEAD("/*filepath", handler)
 
 	fsthttp.Serve(fsthttp.Adapt(router))
 }
@@ -53,7 +50,7 @@ func resolve(site fs.FS, name string) (string, fs.FileInfo, bool) {
 
 func staticHandler(site fs.FS) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		// Rooting the path before cleaning keeps ".." from escaping the site dir.
+		// Rooting the path before cleaning keeps ".." from escaping the site dir
 		name := strings.TrimPrefix(path.Clean("/"+ps.ByName("filepath")), "/")
 
 		file, info, ok := resolve(site, name)
@@ -66,18 +63,10 @@ func staticHandler(site fs.FS) httprouter.Handle {
 			http.Error(w, "internal error", http.StatusInternalServerError)
 			return
 		}
-		defer f.Close()
 
-		ctype := mime.TypeByExtension(path.Ext(file)) // get mime type
-
-		h := w.Header()
-		h.Set("Content-Type", ctype)
-		h.Set("Content-Length", strconv.FormatInt(info.Size(), 10))
-		h.Set("Cache-Control", "no-cache")
-
-		if r.Method == http.MethodHead {
-			return
-		}
-		io.Copy(w, f)
+		w.Header().Set("Cache-Control", "no-cache")
+		// from docs - "[handles] Range requests properly, sets the MIME type, and handles If-Match,
+		// If-Unmodified-Since, If-None-Match, If-Modified-Since, and If-Range requests"
+		http.ServeContent(w, r, info.Name(), info.ModTime(), f.(io.ReadSeeker))
 	}
 }
