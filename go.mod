@@ -1,0 +1,7 @@
+module compute-starter-kit-go
+
+go 1.23.12
+
+require github.com/fastly/compute-sdk-go v1.11.0
+
+require github.com/julienschmidt/httprouter v1.3.0
